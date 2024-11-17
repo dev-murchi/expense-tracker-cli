@@ -1,0 +1,21 @@
+# Node.js dependencies
+node_modules/
+
+# Output of TypeScript compilation
+dist/
+
+# IDE files
+.vscode/
+.idea/
+
+# Log files
+*.log
+
+# NPM debug logs
+npm-debug.log
+
+# Coverage reports
+coverage/
+
+# Jest related
+jest.config.js

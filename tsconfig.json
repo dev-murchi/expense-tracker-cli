@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ES2020", // Set JavaScript version to ES2020
+    "module": "CommonJS", // Use CommonJS for Node.js compatibility
+    "moduleResolution": "node", // Use Node.js module resolution
+    "declaration": true, // Generate `.d.ts` files for type definitions
+    "declarationMap": true, // Generate `.d.ts.map` files for better debugging
+    "outDir": "./dist", // Output directory for transpiled JS files
+    "rootDir": "./src", // Root directory for TypeScript files
+    "strict": true, // Enable strict type-checking options
+    "esModuleInterop": true, // Allow default imports from CommonJS modules
+    "skipLibCheck": true, // Skip checking of declaration files
+    "forceConsistentCasingInFileNames": true, // Ensure consistent casing for filenames
+    "sourceMap": true, // Generate source maps for debugging
+    "inlineSourceMap": false, // Keep source maps in separate `.map` files
+    "noImplicitAny": true, // Disallow `any` type unless explicitly declared
+    "resolveJsonModule": true, // Allow imports of `.json` files
+    "allowSyntheticDefaultImports": true // Allow default imports from non-ES modules
+  },
+  "include": [
+    "src/**/*.ts" // Include all `.ts` files in the `src/` folder
+  ],
+  "exclude": [
+    "**/*.test.ts", // Exclude the test files
+    "node_modules" // Exclude the `node_modules` folder
+  ]
+}
