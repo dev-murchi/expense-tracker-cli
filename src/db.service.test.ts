@@ -21,6 +21,7 @@ describe("DBService", () => {
   beforeEach(() => {
     (Pool as unknown as jest.Mock).mockClear();
     mockPool.query.mockClear();
+    mockPool.end.mockClear();
     dbService = new DBService("fake-connection-string");
   });
 
