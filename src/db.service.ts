@@ -96,4 +96,12 @@ export class DBService {
       throw error;
     }
   }
+
+  async stop() {
+    try {
+      await this.#pool.end();
+    } catch (error: any) {
+      throw error;
+    }
+  }
 }

@@ -5,6 +5,7 @@ import { Pool } from "pg";
 
 const mockPool = {
   query: jest.fn(() => {}),
+  end: jest.fn(() => {}),
 };
 
 jest.mock("pg", () => {
@@ -262,6 +263,30 @@ describe("DBService", () => {
       );
       const resp2 = await dbService.findAll();
       expect(resp2).toEqual([expense]);
+    });
+  });
+
+  describe("stop", () => {
+    it("should throw an error when a problem occured while ending the pool", async () => {
+      mockPool.end.mockImplementationOnce(() =>
+        Promise.reject(new Error("Pool Error"))
+      );
+
+      await expect(dbService.stop()).rejects.toThrow("Pool Error");
+      expect(mockPool.end).toHaveBeenCalledTimes(1);
+    });
+
+    it("should end the pool successfully ", async () => {
+      mockPool.query.mockImplementationOnce(() =>
+        Promise.reject(
+          new Error("Cannot use a pool after calling end on the pool")
+        )
+      );
+      await dbService.stop();
+      expect(mockPool.end).toHaveBeenCalledTimes(1);
+      await expect(dbService.findAll()).rejects.toThrow(
+        "Cannot use a pool after calling end on the pool"
+      );
     });
   });
 });
