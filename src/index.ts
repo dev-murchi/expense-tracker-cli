@@ -24,10 +24,28 @@ if (process.env.DB_URL) {
     });
 
   program
+    .command("delete")
+    .description("Delete an expense")
+    .requiredOption("--id <id>", "Delete the expense with the given id")
+    .action(async (options) => {
+      await deleteExpense(options.id);
+    });
+
+  program
     .command("list")
     .description("View all expenses")
     .action(async () => {
       await getExpenses();
+    });
+
+  program
+    .command("update")
+    .description("Update the expense")
+    .requiredOption("--id <id>", "Expense id")
+    .requiredOption("--amount <amount>", "Amount that is spent for the expense")
+    .action(async (options) => {
+      const { id, amount } = options;
+      await updateExpense(id, amount);
     });
 
   program.parse(process.argv);
@@ -60,6 +78,30 @@ if (process.env.DB_URL) {
           }\t$${expense.amount}.`
         );
       });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      await dbService.stop().catch((err) => console.error(err));
+    }
+  }
+
+  async function updateExpense(id: number, amount: number) {
+    try {
+      const updatedExpense = await dbService.update(id, { amount });
+      console.log(
+        `Expense updated successfully (ID: ${updatedExpense.id}, amount: $${updatedExpense.amount})`
+      );
+    } catch (error) {
+      console.error(error);
+    } finally {
+      await dbService.stop().catch((err) => console.error(err));
+    }
+  }
+
+  async function deleteExpense(id: number) {
+    try {
+      const isDeleted = await dbService.delete(id);
+      console.log(`Expense deleted successfully (ID: ${id})`);
     } catch (error) {
       console.error(error);
     } finally {
