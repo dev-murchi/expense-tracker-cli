@@ -6,6 +6,10 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
+    "start:list": "node dist/index.js list",
+    "start:add": "node dist/index.js add",
+    "start:update": "node dist/index.js update",
+    "start:delete": "node dist/index.js delete",
     "test": "jest"
   },
   "keywords": [
@@ -26,6 +30,7 @@
     "typescript": "^5.6.3"
   },
   "dependencies": {
+    "dotenv": "^16.4.5",
     "pg": "^8.13.1"
   }
 }

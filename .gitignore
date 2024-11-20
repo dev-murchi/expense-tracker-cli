@@ -19,3 +19,6 @@ coverage/
 
 # Jest related
 jest.config.js
+
+#env variables
+.env
