@@ -35,11 +35,15 @@ program
 program
   .command("add")
   .description("Add a expense")
-  .requiredOption("--description <description>", "Expense description")
+  .addOption(
+    new Option("--description <description>", "Expense description")
+      .makeOptionMandatory()
+      .argParser(parseString)
+  )
   .addOption(
     new Option("--amount <amount>", "Amount that is spent for the expense")
       .makeOptionMandatory()
-      .argParser(parsePositiveInteger)
+      .argParser(parseNonNegativeInteger)
   )
   .action(async (options) => {
     const { description, amount } = options;
@@ -99,7 +103,6 @@ program
       if (month !== undefined) {
         month = parseInt(month, 10) - 1;
       }
-      console.log({ year, month });
       const sum = await expenseSummary(year, month);
       if (year === undefined && month === undefined) {
         console.log(`# Total expenses: $${sum}`);
@@ -127,7 +130,7 @@ program
   .addOption(
     new Option("--amount <amount>", "Amount that is spent for the expense")
       .makeOptionMandatory()
-      .argParser(parsePositiveInteger)
+      .argParser(parseNonNegativeInteger)
   )
   .action(async (options) => {
     const { id, amount } = options;
@@ -191,7 +194,6 @@ async function updateExpense(id: number, amount: number) {
 
 async function deleteExpense(id: number) {
   try {
-    console.log({ id });
     const isDeleted = await dbService.delete(id);
     await dbService.stop();
     console.log(`Expense deleted successfully (ID: ${id})`);
@@ -254,4 +256,11 @@ function parsePositiveInteger(value: string): number {
   }
 
   return parsedNumber;
+}
+
+function parseString(str: string): string {
+  if (str.trim().length === 0) {
+    throw new InvalidOptionArgumentError("Please provide a description!");
+  }
+  return str.trim();
 }
