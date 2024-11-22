@@ -9,6 +9,7 @@ Expense Tracker CLI App is a simple command-line tool that helps you manage and 
 - **Add expenses**: Quickly log your daily expenses with descriptions and amounts.
 - **Delete expenses**: Remove any mistakenly added expense by ID.
 - **List all expenses**: View all recorded expenses in one place.
+- **Export all expenses**: Export all recorded expenses to a file in either JSON or CSV format.
 - **Expense summary**: Get a summary of all your expenses for a given month and year.
 - **Update expenses**: Modify the amount for any expense entry.
 
@@ -84,7 +85,14 @@ yarn start delete --id <id>
 yarn start list
 ```
 
-This command will show all the expenses recorded so far.
+`export` - Export all recorded expenses to a file in your desired format (JSON or CSV).
+
+```bash
+yarn start export --file <file-name> --format <format>
+```
+
+- `--file`: Required. Specifies the name of the output file where the data will be saved.
+- `--format`: Optional. Defines the format for the exported data. Supported formats are: `json` (default), and `csv`.
 
 `summary` - Generate a summary of expenses for a particular month and/or year.
 
@@ -122,6 +130,18 @@ yarn start delete --id 101
 
 ```bash
 yarn start list
+```
+
+**Export all expenses in a JSON file:**
+
+```bash
+yarn start list export --file expenses.json
+```
+
+**Export all expenses in a CSV file:**
+
+```bash
+yarn start list export --file expenses.csv --format csv
 ```
 
 **Get a summary of expenses for October 2023:**

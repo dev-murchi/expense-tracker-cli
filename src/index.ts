@@ -3,6 +3,8 @@ import "dotenv/config";
 import { Command, Option, InvalidOptionArgumentError } from "commander";
 import { DBService } from "./db.service";
 import { Expense } from "./model/expense";
+import path from "path";
+import { writeFile } from "fs/promises";
 
 if (!process.env.DB_URL) {
   console.error("Could not connect to database.");
@@ -75,11 +77,44 @@ program
 program
   .command("list")
   .description("View all expenses")
-  .action(async () => {
+  .action(async (options) => {
     try {
-      await getExpenses();
+      const expenses = await getExpenses();
+
+      console.log("# ID\tDate\tDescription\tAmount");
+      expenses.forEach((expense) => {
+        console.log(
+          `# ${expense.id}\t${new Date(expense.date).toLocaleDateString()}\t${
+            expense.description
+          }\t$${expense.amount}.`
+        );
+      });
     } catch (error: any) {
-      console.error("Could not get the expenses!");
+      console.error(error);
+    }
+  });
+
+program
+  .command("export")
+  .description("Export all expenses to a file")
+  .addOption(
+    new Option(
+      "--file <file-name>",
+      "Save expenses into specified file. Default data format is JSON"
+    )
+      .argParser(parseString)
+      .makeOptionMandatory()
+      .implies({ format: "json" })
+  )
+  .addOption(
+    new Option("--format <format>", "Data format").choices(["json", "csv"])
+  )
+  .action(async (options) => {
+    try {
+      const { file, format } = options;
+      const expenses = await getExpenses();
+      await exportExpenses(expenses, file, format);
+    } catch (error: any) {
       console.error(error);
     }
   });
@@ -161,18 +196,11 @@ async function addExpense(description: string, amount: number) {
   }
 }
 
-async function getExpenses() {
+async function getExpenses(): Promise<Expense[]> {
   try {
     const expenses = await dbService.findAll();
     await dbService.stop();
-    console.log("# ID\tDate\tDescription\tAmount");
-    expenses.forEach((expense) => {
-      console.log(
-        `# ${expense.id}\t${new Date(expense.date).toLocaleDateString()}\t${
-          expense.description
-        }\t$${expense.amount}.`
-      );
-    });
+    return expenses;
   } catch (error: any) {
     dbService.stop().catch((err) => console.error(err));
     throw new Error(error);
@@ -260,7 +288,37 @@ function parsePositiveInteger(value: string): number {
 
 function parseString(str: string): string {
   if (str.trim().length === 0) {
-    throw new InvalidOptionArgumentError("Please provide a description!");
+    throw new InvalidOptionArgumentError("Provided value cannot be empty!");
   }
   return str.trim();
+}
+
+async function exportExpenses(
+  expenses: Expense[],
+  filename: string,
+  format: string
+) {
+  let filePath = "";
+  if (filename.startsWith("/")) {
+    filePath = filename;
+  } else {
+    filePath = path.join(__dirname, filename);
+  }
+
+  let data = "";
+
+  if (format === "csv") {
+    let dataArray = ["ID,Date,Description,Amount($)"];
+    expenses.forEach((expense) => {
+      dataArray.push(
+        `${expense.id},${expense.date},${expense.description},${expense.amount}`
+      );
+    });
+
+    data = dataArray.join("\r\n");
+  } else {
+    data = JSON.stringify(expenses);
+  }
+
+  await writeFile(filePath, data);
 }
